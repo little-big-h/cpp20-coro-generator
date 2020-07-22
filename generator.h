@@ -12,6 +12,7 @@
 #include <experimental/coroutine>
 #include <memory>
 #include <iostream>
+#include <optional>
 
 namespace coro_exp {
 
@@ -46,12 +47,12 @@ namespace coro_exp {
     }
 
     T getValue() {
-      return coro.promise().current_value;
+      return *coro.promise().current_value;
     }
 
     struct promise_type {
     private:
-      T current_value{};
+      std::optional<T> current_value{};
       friend class generator;
     public:
       promise_type() = default;
@@ -78,7 +79,7 @@ namespace coro_exp {
       }
 
       auto yield_value(T some_value) {
-        current_value = some_value;
+        *current_value = some_value;
         return std::experimental::suspend_always{};
       }
 
